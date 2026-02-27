@@ -5,6 +5,6 @@ export const asyncHandler = (fn) = async(req,res,next) =>{
         res.status(error.code || 500).json({
             success: false,
             message: error.message
-        })
+        }) 
     }
 }
