@@ -1,22 +1,20 @@
-import mongoose,{Schema} from "mongoose";
-import { User } from "./user.model";
+import mongoose, { Schema } from "mongoose";
 
-const projectSchema = new Schema({
-    name:{
-        type: String,
-        required: [true,"Name is required"],
-
+const projectSchema = new Schema(
+    {
+        name: {
+            type: String,
+            required: [true, "Name is required"],
+            trim: true,
+        },
+        description: String,
+        createdBy: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
     },
-    description: String,
-    createdBy:{
-        type: Schema.Types.ObjectId,
-        ref: User,
-        required: true
-    },
-    members: [{
-        type: Schema.Types.ObjectId,
-        ref: User
-    }]
-},{timestamps:true})
+    { timestamps: true }
+);
 
-export const Project = mongoose.model("Project",projectSchema)
+export const Project = mongoose.model("Project", projectSchema);

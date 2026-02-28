@@ -1,22 +1,31 @@
-import mongoose,{Schema} from "mongoose";
-import { User } from "./user.model";
-import { Project } from "./project.model";
-import { AvailableUserRole, UserRoleEnum } from "../constants";
+import mongoose, { Schema } from "mongoose";
+import { AvailableUserRole, UserRoleEnum } from "../constants.js";
 
-const projectMemberSchema = new Schema({
-    memberName:{
-        type:Schema.Types.ObjectId,
-        ref: User
+const projectMemberSchema = new Schema(
+    {
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        project: {
+            type: Schema.Types.ObjectId,
+            ref: "Project",
+            required: true,
+        },
+        role: {
+            type: String,
+            enum: AvailableUserRole,
+            default: UserRoleEnum.MEMBER,
+        },
     },
-    project:{
-        type: Schema.Types.ObjectId,
-        ref: Project
-    },
-    role:{
-        type: String,
-        enum: AvailableUserRole,
-        default: UserRoleEnum.MEMBER
-    }
-},{timestamps:true})
+    { timestamps: true }
+);
 
-export const ProjectMember = mongoose.model("ProjectMember",projectMemberSchema)
+// Ensure a user can only be a member of a project once
+projectMemberSchema.index({ user: 1, project: 1 }, { unique: true });
+
+export const ProjectMember = mongoose.model(
+    "ProjectMember",
+    projectMemberSchema
+);

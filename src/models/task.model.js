@@ -1,37 +1,37 @@
-import mongoose,{Schema} from "mongoose";
-import { AvailableTaskStatus, TaskStatusEnum } from "../constants";
-import { Project } from "./project.model";
-import { User } from "./user.model";
+import mongoose, { Schema } from "mongoose";
+import { AvailableTaskStatus, TaskStatusEnum } from "../constants.js";
 
-const taskSchema = new Schema({
-    title:{
-        type: String,
-        required: true,
-        trim: true
+const taskSchema = new Schema(
+    {
+        title: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        description: String,
+        status: {
+            type: String,
+            enum: AvailableTaskStatus,
+            default: TaskStatusEnum.TODO,
+        },
+        dueDate: {
+            type: Date,
+            default: null,
+        },
+        project: {
+            type: Schema.Types.ObjectId,
+            ref: "Project",
+        },
+        assignedTo: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+        },
+        assignedBy: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+        },
     },
-    description: String,
-    status:{
-        type: String,
-        enum: AvailableTaskStatus,
-        default: TaskStatusEnum.TODO
-    },
-    dueDate:{
-        type: Date,
-        default: null
-    },
-    project:{
-        type: Schema.Types.ObjectId,
-        ref: Project
-    },
-    assignedTo:{
-        type: Schema.Types.ObjectId,
-        ref: User
-    },
-    assignedBy:{
-        type: Schema.Types.ObjectId,
-        ref: User
-    }
+    { timestamps: true }
+);
 
-},{timestamps:true})
-
-export const Task = mongoose.model("Task",taskSchema)
+export const Task = mongoose.model("Task", taskSchema);
