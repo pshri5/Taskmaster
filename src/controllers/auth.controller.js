@@ -6,22 +6,29 @@ import jwt from "jsonwebtoken";
 
 //helpers 
 
-const generateAccessAndRefreshTokens = async (userId) => {
-    const user = await User.findById(userId).select("+password");
-    if (!user) throw new ApiError(404, "User not found");
+const generateAccessAndRefreshTokens = async (userId, userObj = null) => {
+    try {
+        const user = userObj || await User.findById(userId);
+        if (!user) throw new ApiError(404, "User not found");
 
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
 
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
 
-    return { accessToken, refreshToken };
+        return { accessToken, refreshToken };
+    } catch (error) {
+        throw new ApiError(
+            500,
+            "Something went wrong while generating access and refresh tokens"
+        );
+    }
 };
 
 const cookieOptions = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
 };
 
@@ -73,7 +80,7 @@ export const login = asyncHandler(async (req, res) => {
     }
 
     const { accessToken, refreshToken } =
-        await generateAccessAndRefreshTokens(user._id);
+        await generateAccessAndRefreshTokens(user._id, user);
 
     const loggedInUser = await User.findById(user._id).select(
         "-password -refreshToken"
